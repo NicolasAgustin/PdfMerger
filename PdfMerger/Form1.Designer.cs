@@ -33,6 +33,7 @@
             this.seleccionar = new System.Windows.Forms.Button();
             this.filenameCheckbox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.borrar = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // combinar
@@ -79,11 +80,22 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "NOMBRE DEL ARCHIVO (SIN .PDF)";
             // 
+            // borrar
+            // 
+            this.borrar.Location = new System.Drawing.Point(191, 262);
+            this.borrar.Name = "borrar";
+            this.borrar.Size = new System.Drawing.Size(45, 24);
+            this.borrar.TabIndex = 5;
+            this.borrar.Text = "borrar";
+            this.borrar.UseVisualStyleBackColor = true;
+            this.borrar.Click += new System.EventHandler(this.borrar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(923, 518);
+            this.Controls.Add(this.borrar);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.filenameCheckbox);
             this.Controls.Add(this.seleccionar);
@@ -103,6 +115,7 @@
         private System.Windows.Forms.Button seleccionar;
         private System.Windows.Forms.TextBox filenameCheckbox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button borrar;
     }
 }
 

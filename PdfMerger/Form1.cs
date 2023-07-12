@@ -118,5 +118,25 @@ namespace PdfMerger
             }
 
         }
+
+        private void borrar_Click(object sender, EventArgs e)
+        {
+            int itemsCant = this.displayFiles.CheckedItems.Count;
+            List<string> items = new List<string>();
+
+            for (int i = 0; i < itemsCant; i++)
+            {
+                var item = this.displayFiles.CheckedItems[i];
+                items.Add(item.ToString());
+            }
+
+            items.ForEach(item => {
+                    this.displayFiles.Items.Remove(item);
+                    this.filesToMerge.Remove(item);
+                }
+            );
+
+
+        }
     }
 }
