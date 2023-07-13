@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using PdfSharp.Drawing;
+using System.Collections.Generic;
+
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using PdfSharp.Drawing;
+
 
 namespace PdfMerger
 {
     public partial class Form1 : Form
     {
         private List<string> filesToMerge = null;
+        private PdfDocument currentPdf;
         public Form1()
         {
+            this.currentPdf = new PdfDocument();
             InitializeComponent();
         }
 
@@ -48,46 +47,9 @@ namespace PdfMerger
                 filename = this.filenameCheckbox.Text + ".pdf";
             }
 
-            PdfDocument document = new PdfDocument();
-
-            foreach(var pdf in this.filesToMerge)
-            {
-
-                FileInfo fi = new FileInfo(pdf);
-                if (fi.Extension == ".pdf")
-                {
-                    using (var pdfReaded = PdfReader.Open(pdf, PdfDocumentOpenMode.Import))
-                    {
-                        for (int i = 0; i < pdfReaded.PageCount; i++)
-                        {
-                            document.AddPage(pdfReaded.Pages[i]);
-                        }
-                    }
-                } else
-                {
-                    try
-                    {
-                        // TODO: Redimensionar foto para que encaje perfectamente en A4
-                        PdfPage page = document.AddPage();
-                        XGraphics gfx = XGraphics.FromPdfPage(page);
-
-                        XImage image = XImage.FromFile(pdf);
-
-                        page.Width = image.PixelWidth;
-                        page.Height = image.PixelHeight;
-                        gfx.DrawImage(image, 0, 0, image.PixelWidth, image.PixelHeight);
-                    } catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                }
-
-
-            }
-
             string finalpath = Path.Combine(folder, filename);
 
-            document.Save(finalpath);
+            this.currentPdf.Save(finalpath);
 
             MessageBoxButtons buttons = MessageBoxButtons.OK;
 
@@ -101,6 +63,7 @@ namespace PdfMerger
             this.filesToMerge = null;
             this.filenameCheckbox.Text = string.Empty;
             this.displayFiles.Items.Clear();
+            this.currentPdf = new PdfDocument();
         }
 
         private void seleccionar_Click(object sender, EventArgs e)
@@ -116,6 +79,8 @@ namespace PdfMerger
                     this.displayFiles.Items.Add(f);
                }
             }
+
+            buildPdfFromSelectedFiles();
 
         }
 
@@ -135,8 +100,64 @@ namespace PdfMerger
                     this.filesToMerge.Remove(item);
                 }
             );
+        }
 
+        private void previewBtn_Click(object sender, EventArgs e)
+        {
+            // TODO: Redimensionar visualizacion para que encaje perfectamente con
+            // el width del contenedor
+            Spire.Pdf.PdfDocument pdf = new Spire.Pdf.PdfDocument();
+            MemoryStream ms = new MemoryStream();
+            this.currentPdf.Save(ms, false);
+            pdf.LoadFromStream(ms);
+            this.previewControl.Rows = this.currentPdf.PageCount;
+            pdf.Preview(this.previewControl);
 
+        }
+
+        private void buildPdfFromSelectedFiles()
+        {
+            foreach (var pdf in this.filesToMerge)
+            {
+
+                FileInfo fi = new FileInfo(pdf);
+                if (fi.Extension == ".pdf")
+                {
+                    using (var pdfReaded = PdfReader.Open(pdf, PdfDocumentOpenMode.Import))
+                    {
+                        for (int i = 0; i < pdfReaded.PageCount; i++)
+                        {
+                            this.currentPdf.AddPage(pdfReaded.Pages[i]);
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // TODO: Redimensionar foto para que encaje perfectamente en A4
+                        // TODO: Permitir voltear las paginas del pdf
+                        PdfPage page = this.currentPdf.AddPage();
+                        XGraphics gfx = XGraphics.FromPdfPage(page);
+
+                        XImage image = XImage.FromFile(pdf);
+
+                        page.Width = image.PixelWidth;
+                        page.Height = image.PixelHeight;
+                        gfx.DrawImage(image, 0, 0, image.PixelWidth, image.PixelHeight);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+                }
+
+            }
+        }
+
+        private void displayFiles_ControlAdded(object sender, ControlEventArgs e)
+        {
+            
         }
     }
 }
